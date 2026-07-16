@@ -1,0 +1,168 @@
+/*
+ * musemesh - one-screen DOS-style site. Two-color monochrome via --bg/--ink
+ * (dark default; [data-theme="light"] inverts - round 3).
+ * Specs: docs/superpowers/specs/2026-07-12-musemesh-website-design.md
+ *   + 2026-07-16-musemesh-site-round2-design.md
+ *   + 2026-07-16-musemesh-free-for-now-design.md (round 3)
+ *
+ * Font: "PxPlus IBM VGA 8x16" (Web build) from The Ultimate Oldschool PC
+ * Font Pack v2.2 by VileR (https://int10h.org/oldschool-pc-fonts/),
+ * CC BY-SA 4.0. This attribution must be kept (also in README.md).
+ */
+@font-face {
+  font-family: 'DOS VGA';
+  src: url('assets/WebPlus_IBM_VGA_8x16.woff') format('woff');
+  font-display: swap;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root { --bg: #000; --ink: #fff; color-scheme: dark; }
+:root[data-theme="light"] { --bg: #fff; --ink: #000; color-scheme: light; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DOS VGA', 'Courier New', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+a { color: inherit; }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+::selection { background: var(--ink); color: var(--bg); }
+
+/* ---- the DOS window (above the z-index:0 sketch canvas) ---- */
+.win {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  border: 3px double var(--ink);
+  width: min(92vw, 640px);
+  max-height: 94vh;  /* fallback for pre-svh Safari */
+  max-height: 94svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px double var(--ink);
+  padding: 4px 10px;
+  font-size: clamp(0.9rem, 2.6vw, 1.05rem);
+}
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 10px 0;
+  font-size: clamp(0.85rem, 2.8vw, 1rem);
+}
+.menu-btn { padding: 1px 7px; letter-spacing: 1.2px; }
+.menu-btn.active { background: var(--ink); color: var(--bg); }
+.sep { opacity: 0.5; }
+
+/* ---- panes: all stacked in one grid cell so the window is sized by the
+   tallest pane and never jumps on switch; [hidden] keeps layout via
+   visibility so that sizing holds. overflow-y is the spec-7 safety valve. */
+.panes { display: grid; overflow-y: auto; }
+.pane {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 22px 20px 26px;
+  text-align: center;
+}
+.pane[hidden] { display: flex; visibility: hidden; }
+
+.wordmark {
+  font-size: clamp(2.2rem, 9vw, 4rem);
+  font-weight: normal;
+  letter-spacing: 2px;
+}
+h2 {
+  font-size: clamp(1.2rem, 4.2vw, 1.6rem);
+  font-weight: normal;
+  letter-spacing: 1px;
+}
+.pane p { font-size: clamp(1.05rem, 3.8vw, 1.375rem); line-height: 1.5; }
+.lines { text-align: left; }
+.about-text { max-width: 34ch; }
+
+.btn-box {
+  border: 2px solid var(--ink);
+  background: var(--bg);
+  padding: 8px 22px;
+  font-size: clamp(1rem, 3.4vw, 1.25rem);
+}
+
+.statusline {
+  border-top: 3px double var(--ink);
+  padding: 3px 10px;
+  font-size: clamp(0.8rem, 2.4vw, 0.95rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- round 2: RUN A ROOM commerce controls ---- */
+a.btn-box { display: inline-block; text-decoration: none; }
+.coupon-row { display: flex; align-items: center; gap: 8px; }
+#coupon-input {
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  padding: 2px 8px;
+  width: 12ch;
+  text-transform: uppercase;
+}
+.dl-note { font-size: clamp(0.85rem, 2.6vw, 1rem); }
+
+/* ---- round 3: fixed corner toggles (outside the window, above it) ---- */
+.corner {
+  position: fixed;
+  top: 10px;
+  z-index: 2;
+  border: 2px solid var(--ink);
+  background: var(--bg);
+  padding: 3px 9px;
+  font-size: clamp(0.75rem, 2.2vw, 0.9rem);
+}
+.corner-left { left: 10px; }
+.corner-right { right: 10px; }
+
+/* landscape phones: tighten so one screen still holds everything */
+@media (max-height: 420px) {
+  .pane { gap: 8px; padding: 10px 16px 12px; }
+  .wordmark { font-size: clamp(1.4rem, 9vh, 2.2rem); }
+  .pane p { font-size: clamp(0.9rem, 4.5vh, 1.1rem); }
+}
+
+/* portrait phones: shrink the MENU font (both languages) until the four sr
+   labels fit one line at 390px (spec 10 STOP resolution, 7faa037) - the
+   1.2px letter-spacing is fixed-width, so only the glyph advances scale */
+@media (max-width: 450px) {
+  .menu { font-size: 0.69rem; }
+}

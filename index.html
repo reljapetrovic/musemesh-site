@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>musemesh &mdash; every phone in the room becomes a speaker</title>
+<meta name="description" content="musemesh turns the audience's phones into a room-sized, in-sync speaker system. no app - scan a QR code and play.">
+<meta property="og:title" content="musemesh">
+<meta property="og:description" content="every phone in the room becomes a speaker">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button id="theme-toggle" class="corner corner-left" data-i18n="toggle.invert">[ invert ]</button>
+<button id="lang-toggle" class="corner corner-right" aria-label="language">[ &#1057;&#1056;&#1055; ]</button>
+<main class="win" aria-label="musemesh">
+  <div class="titlebar">
+    <span><span aria-hidden="true">&#9608;</span> <span data-i18n="titlebar">&#10095; include the audience</span></span>
+    <button id="close-btn" aria-label="close window" data-i18n-aria="aria.close">[X]</button>
+  </div>
+  <nav class="menu" aria-label="pages" data-i18n-aria="aria.pages">
+    <button class="menu-btn active" data-page="home" data-i18n="menu.home">HOME</button><span class="sep" aria-hidden="true">|</span><button class="menu-btn" data-page="how-it-works" data-i18n="menu.how">HOW IT WORKS</button><span class="sep" aria-hidden="true">|</span><button class="menu-btn" data-page="run-a-room" data-i18n="menu.run">RUN A ROOM</button><span class="sep" aria-hidden="true">|</span><button class="menu-btn" data-page="about" data-i18n="menu.about">ABOUT</button>
+  </nav>
+  <div class="panes">
+    <section class="pane" id="home">
+      <h1 class="wordmark" data-i18n="wordmark">musemesh</h1>
+      <p class="tagline" data-i18n="home.tagline">every phone in the room becomes a speaker</p>
+      <p data-i18n="home.line">no app. scan a QR code, tap once &mdash; you're part of the sound system.</p>
+      <button class="btn-box" id="goto-how" data-i18n="home.cta">[ how it works ]</button>
+    </section>
+    <section class="pane" id="how-it-works" hidden>
+      <h2 data-i18n="how.h">HOW IT WORKS</h2>
+      <div class="lines">
+        <p data-i18n="how.1">&gt; a performer hosts a room &mdash; a tiny server in their DAW or app</p>
+        <p data-i18n="how.wifi">&gt; everyone joins the venue's wifi &mdash; performer and phones on the same network</p>
+        <p data-i18n="how.2">&gt; the crowd scans a QR code. no app, no signup &mdash; the browser is the speaker</p>
+        <p data-i18n="how.3">&gt; every phone plays its own channel, in sync</p>
+        <p data-i18n="how.4">&gt; the room becomes the sound system</p>
+      </div>
+    </section>
+    <section class="pane" id="run-a-room" hidden>
+      <h2 data-i18n="run.h">RUN A ROOM</h2>
+      <div class="lines">
+        <p data-i18n="run.1">&gt; load musemesh-server in your DAW (VST3/AU)</p>
+        <p data-i18n="run.2">&gt; send it channels with musemesh-channel</p>
+        <p data-i18n="run.3">&gt; show the QR &mdash; the crowd does the rest</p>
+      </div>
+      <!-- checkout disabled while the kit is free; to re-enable: uncomment + swap REPLACE-ME in app.js (see README "Commerce")
+      <a class="btn-box" id="buy-link" href="#" target="_blank" rel="noopener">[ buy the room kit &mdash; $5 ]</a>
+      <p class="coupon-row"><label for="coupon-input">coupon code:</label> <input id="coupon-input" maxlength="32" autocomplete="off" spellcheck="false"></p>
+      -->
+      <a class="btn-box" id="download-link" href="https://github.com/reljapetrovic/musemesh-site/releases/latest/download/musemesh-room-kit-mac.zip" download data-i18n="run.dl">[ download &mdash; free ]</a>
+      <p class="dl-note" id="dl-note" data-i18n="run.dlnote">macOS VST3/AU &middot; ~29 MB &middot; unsigned build &mdash; see INSTALL.txt inside</p>
+    </section>
+    <section class="pane" id="about" hidden>
+      <h2 data-i18n="about.h">ABOUT</h2>
+      <p class="about-text" data-i18n="about.text">musemesh is an experiment in shared performance: instead of one PA, the audience's phones become a distributed speaker orchestra. built by relja petrovic + ai.</p>
+    </section>
+    <section class="pane" id="contact" hidden>
+      <h2 data-i18n="contact.h">CONTACT</h2>
+      <div class="lines">
+        <p><span data-i18n="contact.email">&gt; email:</span> <a href="mailto:relja.petrovic@gmail.com">relja.petrovic@gmail.com</a></p>
+        <p data-i18n="contact.line">say hi / features requests / feedback.</p>
+      </div>
+    </section>
+  </div>
+  <div class="statusline"><span id="status-text" aria-live="polite">(c) 2026 musemesh</span><span class="sep" aria-hidden="true">&middot;</span><button class="menu-btn" data-page="contact" data-i18n="menu.contact">CONTACT</button></div>
+</main>
+<script src="strings.js"></script>
+<script src="assets/p5.min.js"></script>
+<script src="sketch.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
