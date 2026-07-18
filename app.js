@@ -1,4 +1,4 @@
-// musemesh - routing + [X] egg + theme/lang toggles (+ dormant Gumroad commerce).
+// musemesh - routing + [X] crash egg + theme/lang toggles (+ dormant Gumroad commerce).
 // Specs: v1 4 (routing/egg), round-2 5 (commerce, now commented in markup),
 // round-3 2/5/6 (checkout commented; [ invert ] theme; en/sr language).
 (function () {
@@ -6,7 +6,6 @@
   var PAGES = ['home', 'how-it-works', 'run-a-room', 'about', 'contact'];
   var buttons = Array.prototype.slice.call(document.querySelectorAll('.menu-btn'));
   var statusText = document.getElementById('status-text');
-  var statusTimer = null;
   var lang = 'en';
   var theme = 'dark';
   try { if (localStorage.getItem('musemesh.lang') === 'sr') { lang = 'sr'; } } catch (e) {}
@@ -28,7 +27,6 @@
       el.setAttribute('aria-label', str(el.getAttribute('data-i18n-aria')));
     });
     document.getElementById('lang-toggle').textContent = lang === 'en' ? '[ \u0421\u0420\u041F ]' : '[ EN ]';
-    clearTimeout(statusTimer); // a pending egg revert must not restore the old language
     statusText.textContent = str('status.default');
   }
 
@@ -68,12 +66,74 @@
     location.hash = 'how-it-works';
   });
 
-  document.getElementById('close-btn').addEventListener('click', function () {
-    statusText.textContent = str('status.egg');
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(function () {
-      statusText.textContent = str('status.default');
-    }, 2000);
+  // ---- the [X] crash egg (2026-07-17 website-crash-egg spec; ported from
+  // the S400 room-pages egg). One-shot ~1s: window shake + a monochrome
+  // particle burst from the [X], then everything reverts. Vanilla canvas at
+  // z-index 3 — the p5 background canvas sits BEHIND the window (z-index 0)
+  // and cannot host the burst. Dot color reads --ink at tap time so it
+  // follows [ invert ]. prefers-reduced-motion gets a motion-free 1s window
+  // invert instead.
+  var eggActive = false; // 1s lockout — re-taps while running are ignored
+  var closeBtn = document.getElementById('close-btn');
+
+  function crashBurst(originX, originY) {
+    var dpr = window.devicePixelRatio || 1;
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.floor(window.innerWidth * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;';
+    document.body.appendChild(canvas);
+    var g = canvas.getContext('2d');
+    g.scale(dpr, dpr);
+
+    var ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#fff';
+    var dots = [];
+    for (var i = 0; i < 60; i++) {
+      dots.push({
+        angle: Math.random() * Math.PI * 2,
+        speed: 120 + Math.random() * 480, // px/s
+        radius: 1.5 + Math.random() * 2.5
+      });
+    }
+
+    var t0 = performance.now();
+    var DURATION_MS = 1000;
+    function frame(now) {
+      var t = (now - t0) / DURATION_MS; // 0..1
+      if (t >= 1) { canvas.remove(); return; }
+      g.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      g.fillStyle = ink;
+      g.globalAlpha = 1 - t;
+      for (var k = 0; k < dots.length; k++) {
+        var d = dots[k];
+        var dist = d.speed * t;
+        g.beginPath();
+        g.arc(originX + Math.cos(d.angle) * dist, originY + Math.sin(d.angle) * dist, d.radius, 0, Math.PI * 2);
+        g.fill();
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  closeBtn.addEventListener('click', function () {
+    if (eggActive) return;
+    eggActive = true;
+    var win = document.querySelector('.win');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      win.classList.add('crashed');
+    } else {
+      var r = closeBtn.getBoundingClientRect();
+      crashBurst(r.left + r.width / 2, r.top + r.height / 2);
+      win.classList.add('shaking');
+    }
+    // Timeout (not animationend) ends BOTH branches — deterministic even if
+    // the tab is backgrounded mid-effect.
+    setTimeout(function () {
+      win.classList.remove('shaking', 'crashed');
+      eggActive = false;
+    }, 1000);
   });
 
   document.getElementById('theme-toggle').addEventListener('click', function () {
